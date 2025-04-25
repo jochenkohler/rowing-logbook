@@ -64,7 +64,17 @@ export default function RowingLogbook() {
     setWarning("");
 
     try {
-      await saveLogbookToGitHub(updatedLogbook);
+      const response = await fetch("/api/saveLog", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ logbook }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to save logbook to GitHub");
+      }
     } catch (error) {
       console.error(error);
       setWarning("Failed to save to GitHub.");
