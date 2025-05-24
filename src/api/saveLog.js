@@ -1,58 +1,43 @@
+import { Octokit } from "@octokit/rest";
+
 export default async function handler(req, res) {
-  if (req.method !== 'POST') {
-    return res.status(405).json({ message: 'Method not allowed' });
+  const GITHUB_TOKEN = process.env.GITHUB_TOKEN;
+  const REPO_OWNER = "jochenkohler";
+  const REPO_NAME  = "rowing-logbook";
+  const FILE_PATH  = "Data/rowing-logbook.json";
+  const BRANCH     = "main";
+
+  const octokit = new Octokit({ auth: GITHUB_TOKEN });
+
+  if (req.method !== "POST") {
+    return res.status(405).end();
   }
+  // 1) Fetch the current file from GitHub
+  const { data: getData } = await octokit.repos.getContent({
+    owner: jochenkohler,
+    repo: rowing-logbook,
+    path: /Data/rowing-logbook.json,
+    ref: main,
+  });
+  const sha     = getData.sha;
+  const content = Buffer.from(getData.content, "base64").toString();
+  const logbook = JSON.parse(content);
 
-  const { logbook } = req.body;
+  // 2) Append new tours from the request
+  const newEntries = req.body.newTours; // send just the new ones
+  const updated   = logbook.concat(newEntries);
 
-  const GITHUB_TOKEN = process.env.VITE_GITHUB_TOKEN;
-  const REPO = "jochenkohler/rowing-logbook";
-  const FILE_PATH = "Data/rowing-logbook.json";
-  const BRANCH = "main";
+  // 3) Commit the updated JSON back to GitHub
+  const newContent = Buffer.from(JSON.stringify(updated, null, 2)).toString("base64");
+  await octokit.repos.createOrUpdateFileContents({
+    owner: REPO_OWNER,
+    repo: REPO_NAME,
+    path: FILE_PATH,
+    message: `Add ${newEntries.length} tour(s) (${newEntries.map(t => t.boatName).join(", ")})`,
+    content: newContent,
+    sha,
+    branch: BRANCH,
+  });
 
-  const latestTour = logbook[logbook.length - 1];
-  const date = latestTour?.date || "Unknown Date";
-  const boat = latestTour?.boatName || "Unknown Boat";
-  const crew = latestTour?.crew?.join(", ") || "Unknown Crew";
-
-  const commitMessage = `Tour completed: ${boat} on ${date} with ${crew}`;
-
-  const base64Content = Buffer.from(JSON.stringify(logbook, null, 2)).toString('base64');
-
-  try {
-    // Check if file already exists (to get sha)
-    const resGet = await fetch(`https://api.github.com/repos/${REPO}/contents/${FILE_PATH}`, {
-      headers: {
-        Authorization: `token ${GITHUB_TOKEN}`,
-        Accept: "application/vnd.github+json",
-      },
-    });
-
-    const getData = await resGet.json();
-    const sha = getData.sha || undefined;
-
-    // Now update or create the file
-    const resPut = await fetch(`https://api.github.com/repos/${REPO}/contents/${FILE_PATH}`, {
-      method: "PUT",
-      headers: {
-        Authorization: `token ${GITHUB_TOKEN}`,
-        Accept: "application/vnd.github+json",
-      },
-      body: JSON.stringify({
-        message: commitMessage,
-        content: base64Content,
-        branch: BRANCH,
-        sha: sha,
-      }),
-    });
-
-    if (!resPut.ok) {
-      throw new Error("GitHub save failed.");
-    }
-
-    return res.status(200).json({ message: "Saved to GitHub successfully!" });
-  } catch (error) {
-    console.error(error);
-    return res.status(500).json({ message: "Saving to GitHub failed." });
-  }
+  res.status(200).json({ success: true, totalTours: updated.length });
 }

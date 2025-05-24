@@ -88,13 +88,30 @@ export default function RowingLogbook() {
     }
   };
 
-  const handleEndTour = () => {
+  const handleEndTour = async () => {
     if (logEntry.endTime && logEntry.kilometres) {
-      setLogbook(prev => prev.map(entry =>
+      // Update local state
+      const updatedLogbook = logbook.map(entry =>
         entry.boatName === logEntry.boatName && entry.status === "påVannet"
           ? { ...entry, endTime: logEntry.endTime, kilometres: logEntry.kilometres, comments: logEntry.comments, status: "fullført" }
           : entry
-      ));
+      );
+      setLogbook(updatedLogbook);
+
+      // Prepare new entry for persistence
+      const newEntry = updatedLogbook.find(e => e.boatName === logEntry.boatName && e.status === "fullført");
+      try {
+        await fetch("/api/saveLog", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ newTours: [newEntry] }),
+        });
+      } catch (err) {
+        console.error(err);
+        setWarning("Kunne ikke lagre til GitHub.");
+      }
+
+      // Reset form
       setLogEntry({ date: getCurrentDate(), startTime: getCurrentTime(), endTime: "", boatType: "", boatName: "", crew: [], kilometres: "", comments: "", status: "" });
       setWarning("");
     } else {
