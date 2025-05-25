@@ -16,16 +16,28 @@ export default async function handler(req, res) {
   try {
     const octokit = new Octokit({ auth: GITHUB_TOKEN });
 
-    // 1) Fetch the current file
-    const { data: getData } = await octokit.repos.getContent({
-      owner: REPO_OWNER,
-      repo: REPO_NAME,
-      path: FILE_PATH,
-      ref: BRANCH,
-    });
-    const sha = getData.sha;
-    const content = Buffer.from(getData.content, "base64").toString();
-    const logbook = JSON.parse(content);
+    // Try fetching existing file, fallback to empty array if not found
+    let sha;
+    let logbook;
+    try {
+      const { data: getData } = await octokit.repos.getContent({
+        owner: REPO_OWNER,
+        repo: REPO_NAME,
+        path: FILE_PATH,
+        ref: BRANCH,
+      });
+      sha = getData.sha;
+      const content = Buffer.from(getData.content, "base64").toString();
+      logbook = JSON.parse(content);
+    } catch (fetchErr) {
+      if (fetchErr.status === 404) {
+        // File not found: initialize empty logbook
+        sha = undefined;
+        logbook = [];
+      } else {
+        throw fetchErr;
+      }
+    }
 
     // 2) Append new entries
     const newEntries = req.body.newTours;
