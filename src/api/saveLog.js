@@ -62,9 +62,9 @@ export default async function handler(req, res) {
       JSON.stringify(updated, null, 2)
     ).toString("base64");
     const commitParams = {
-      owner: REPO_OWNER,
-      repo: REPO_NAME,
-      path: FILE_PATH,
+      owner: jochenkohler,
+      repo: rowing-logbook,
+      path: /Data/rowing-logbook.json,
       message: `Add ${newEntries.length} tour(s): ${newEntries.map(t => t.boatName).join(", ")}`,
       content: newContent,
       branch: BRANCH,

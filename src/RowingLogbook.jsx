@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import clsx from "clsx";
-import { saveLogbookToGitHub } from "./api/saveLog";
 
 export default function RowingLogbook() {
   const getCurrentDate = () => new Date().toISOString().slice(0, 10);
