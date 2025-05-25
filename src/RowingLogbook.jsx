@@ -21,28 +21,70 @@ export default function RowingLogbook() {
   const [warning, setWarning] = useState("");
 
   const boats = [
-    { name: "Lyn", type: "1x" }, { name: "Torden", type: "1x" }, { name: "Marit", type: "1x" },
-    { name: "Solfrid", type: "1x" }, { name: "Mona", type: "1x" }, { name: "Cecilie", type: "1x" },
-    { name: "Korona", type: "1x" }, { name: "Per Arvid", type: "1x" }, { name: "Storm", type: "1x" },
-    { name: "Kristian", type: "1x" }, { name: "Nils", type: "1x" }, { name: "Tom Espen", type: "2x" },
-    { name: "Trondhjems", type: "2x" }, { name: "Tronøya", type: "2x" }, { name: "Alphatron", type: "2x" },
-    { name: "Haldis", type: "2x/2-" }, { name: "Wintech", type: "4x/4-" }, { name: "Knut", type: "4x" },
-    { name: "Ståle", type: "4-" }, { name: "Audun", type: "4x/4-" }
+    { name: "Lyn", type: "1x" },
+    { name: "Torden", type: "1x" },
+    { name: "Marit", type: "1x" },
+    { name: "Solfrid", type: "1x" },
+    { name: "Mona", type: "1x" },
+    { name: "Cecilie", type: "1x" },
+    { name: "Korona", type: "1x" },
+    { name: "Per Arvid", type: "1x" },
+    { name: "Storm", type: "1x" },
+    { name: "Kristian", type: "1x" },
+    { name: "Nils", type: "1x" },
+    { name: "Tom Espen", type: "2x" },
+    { name: "Trondhjems", type: "2x" },
+    { name: "Tronøya", type: "2x" },
+    { name: "Alphatron", type: "2x" },
+    { name: "Haldis", type: "2x/2-" },
+    { name: "Wintech", type: "4x/4-" },
+    { name: "Knut", type: "4x" },
+    { name: "Ståle", type: "4-" },
+    { name: "Audun", type: "4x/4-" }
   ];
 
-  const uniqueBoatTypes = [...new Set(boats.map(b => b.type))];
-  const boatOptionsByType = boats.filter(b => b.type === logEntry.boatType);
+  const uniqueBoatTypes = [...new Set(boats.map((b) => b.type))];
+  const boatOptionsByType = boats.filter((b) => b.type === logEntry.boatType);
 
   const nifMembers = [
-    "Martin Haugen", "Geir Wevang", "Ellen Anna A. Jaatun", "Solveig Berthung", "Mari Hasle Falch",
-    "Elin Bergene", "Pål M. Høien", "Marte Daae-Qvale Holmemo", "Inge Norstad", "Arild Henriksen",
-    "Jennifer Branlat", "Astrid Skogvang", "Eirik Skogvang", "Paul G. Bjørnerud", "Martin Gilje Jaatun",
-    "Christine Høyvik", "Jakob Andreassen Jaatun", "Jennifer Mary Green", "Lars A. Jaatun",
-    "Jochen Köhler", "Ole Tore Buset", "Ida-Marie Høyvik", "Vegard Djuvsland", "Ane Elinsdatter Høien Bergene",
-    "Ylva Green Borgos", "Fredrik Slagstad Nyheim", "Ola Werkland Hammer", "Federico Ustolin",
-    "Ole Alvin Hegle-Buchmann", "Hedvig Norstad Holmemo", "Henrik Halvorsen", "Vincent Lausselet",
-    "Fredrik Slupphaug", "Jaheel Mikael Sølvhaug", "Paolo De Petris", "Florian Konert",
-    "Julia B. Köhler", "Berit Köhler"
+    "Martin Haugen",
+    "Geir Wevang",
+    "Ellen Anna A. Jaatun",
+    "Solveig Berthung",
+    "Mari Hasle Falch",
+    "Elin Bergene",
+    "Pål M. Høien",
+    "Marte Daae-Qvale Holmemo",
+    "Inge Norstad",
+    "Arild Henriksen",
+    "Jennifer Branlat",
+    "Astrid Skogvang",
+    "Eirik Skogvang",
+    "Paul G. Bjørnerud",
+    "Martin Gilje Jaatun",
+    "Christine Høyvik",
+    "Jakob Andreassen Jaatun",
+    "Jennifer Mary Green",
+    "Lars A. Jaatun",
+    "Jochen Köhler",
+    "Ole Tore Buset",
+    "Ida-Marie Høyvik",
+    "Vegard Djuvsland",
+    "Ane Elinsdatter Høien Bergene",
+    "Ylva Green Borgos",
+    "Fredrik Slagstad Nyheim",
+    "Ola Werkland Hammer",
+    "Federico Ustolin",
+    "Ole Alvin Hegle-Buchmann",
+    "Hedvig Norstad Holmemo",
+    "Henrik Halvorsen",
+    "Vincent Lausselet",
+    "Fredrik Slupphaug",
+    "Jaheel Mikael Sølvhaug",
+    "Paolo De Petris",
+    "Florian Konert",
+    "Julia B. Köhler",
+    "Berit Köhler"
   ];
 
   const handleChange = (e) => {
@@ -61,13 +103,19 @@ export default function RowingLogbook() {
   };
 
   const handleStartTour = () => {
-    const selectedBoat = boats.find(b => b.name === logEntry.boatName);
-    const crewCount = selectedBoat ? parseInt(selectedBoat.type.match(/\d+/)) || 1 : 1;
+    const selectedBoat = boats.find((b) => b.name === logEntry.boatName);
+    const crewCount = selectedBoat
+      ? parseInt(selectedBoat.type.match(/\d+/)) || 1
+      : 1;
 
     // Prevent duplicate boat or crew on water
-    const boatBusy = logbook.some(entry => entry.boatName === logEntry.boatName && entry.status === "påVannet");
-    const crewBusy = logEntry.crew.some(member =>
-      logbook.some(entry => entry.status === "påVannet" && entry.crew.includes(member))
+    const boatBusy = logbook.some(
+      (entry) => entry.boatName === logEntry.boatName && entry.status === "påVannet"
+    );
+    const crewBusy = logEntry.crew.some((member) =>
+      logbook.some(
+        (entry) => entry.status === "påVannet" && entry.crew.includes(member)
+      )
     );
     if (boatBusy) {
       setWarning("Denne båten er allerede på vannet.");
@@ -79,9 +127,28 @@ export default function RowingLogbook() {
     }
 
     // Validate required fields
-    if (logEntry.date && logEntry.startTime && logEntry.boatName && logEntry.crew.length === crewCount && logEntry.crew.every(Boolean)) {
-      setLogbook([...logbook, { ...logEntry, status: "påVannet" }]);
-      setLogEntry({ date: getCurrentDate(), startTime: getCurrentTime(), endTime: "", boatType: "", boatName: "", crew: [], kilometres: "", comments: "", status: "" });
+    if (
+      logEntry.date &&
+      logEntry.startTime &&
+      logEntry.boatName &&
+      logEntry.crew.length === crewCount &&
+      logEntry.crew.every(Boolean)
+    ) {
+      setLogbook([
+        ...logbook,
+        { ...logEntry, status: "påVannet" }
+      ]);
+      setLogEntry({
+        date: getCurrentDate(),
+        startTime: getCurrentTime(),
+        endTime: "",
+        boatType: "",
+        boatName: "",
+        crew: [],
+        kilometres: "",
+        comments: "",
+        status: ""
+      });
       setWarning("");
     } else {
       setWarning("Vennligst fyll ut dato, starttid, båt og mannskap.");
@@ -89,34 +156,59 @@ export default function RowingLogbook() {
   };
 
   const handleEndTour = async () => {
-    if (logEntry.endTime && logEntry.kilometres) {
-      // Update local state
-      const updatedLogbook = logbook.map(entry =>
-        entry.boatName === logEntry.boatName && entry.status === "påVannet"
-          ? { ...entry, endTime: logEntry.endTime, kilometres: logEntry.kilometres, comments: logEntry.comments, status: "fullført" }
-          : entry
-      );
-      setLogbook(updatedLogbook);
-
-      // Prepare new entry for persistence
-      const newEntry = updatedLogbook.find(e => e.boatName === logEntry.boatName && e.status === "fullført");
-      try {
-        await fetch("/api/saveLog", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ newTours: [newEntry] }),
-        });
-      } catch (err) {
-        console.error(err);
-        setWarning("Kunne ikke lagre til GitHub.");
-      }
-
-      // Reset form
-      setLogEntry({ date: getCurrentDate(), startTime: getCurrentTime(), endTime: "", boatType: "", boatName: "", crew: [], kilometres: "", comments: "", status: "" });
-      setWarning("");
-    } else {
+    if (!(logEntry.endTime && logEntry.kilometres)) {
       setWarning("Angi kilometre og sluttid før avslutning.");
+      return;
     }
+
+    // 1. Update UI immediately
+    const updated = logbook.map((e) =>
+      e.boatName === logEntry.boatName && e.status === "påVannet"
+        ? {
+            ...e,
+            endTime: logEntry.endTime,
+            kilometres: logEntry.kilometres,
+            comments: logEntry.comments,
+            status: "fullført"
+          }
+        : e
+    );
+    setLogbook(updated);
+
+    // 2. Prepare the entry for GitHub
+    const newEntry = updated.find(
+      (e) => e.boatName === logEntry.boatName && e.status === "fullført"
+    );
+
+    // 3. Fire the API call
+    try {
+      const res = await fetch("/api/saveLog", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ newTours: [newEntry] })
+      });
+      const text = await res.text();
+      console.log("saveLog response:", res.status, text);
+      if (!res.ok) {
+        setWarning(`Kunne ikke lagre til GitHub: ${res.status}`);
+      }
+    } catch (err) {
+      console.error("Network error saving log:", err);
+      setWarning("Nettverksfeil ved lagring til GitHub.");
+    }
+
+    // 4. Reset form
+    setLogEntry({
+      date: getCurrentDate(),
+      startTime: getCurrentTime(),
+      endTime: "",
+      boatType: "",
+      boatName: "",
+      crew: [],
+      kilometres: "",
+      comments: "",
+      status: ""
+    });
   };
 
   const sortByGivenName = arr => [...arr].sort((a, b) => a.split(" ")[0].localeCompare(b.split(" ")[0]));
