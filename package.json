@@ -9,9 +9,10 @@
   "dependencies": {
     "clsx": "^1.2.1",
     "react": "^18.2.0",
-    "react-dom": "^18.2.0"
+    "react-dom": "^18.2.0",
+    "@octokit/rest": "^19.0.7"
   },
   "devDependencies": {
-    "vite": "^4.0.0"
+    "vite": "^4.5.13"
   }
 }
